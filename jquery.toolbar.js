@@ -318,7 +318,6 @@ if ( typeof Object.create !== 'function' ) {
             var toolbarObj = $(this).data('toolbarObj');
             var method = toolbarObj[options];
             if(toolbarObj){
-                console.log(toolbarObj)
                 return method.apply(toolbarObj, $.makeArray(arguments).slice(1));
             }
         }
