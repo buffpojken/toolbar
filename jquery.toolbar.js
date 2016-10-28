@@ -62,6 +62,21 @@ if ( typeof Object.create !== 'function' ) {
 
         setTrigger: function() {
             var self = this;
+            if(!self.options.event){
+
+                if (self.options.hideOnClick) {
+                    $('html').on("click.toolbar", function ( event ) {
+                        if (event.target != self.elem &&
+                            self.$elem.has(event.target).length === 0 &&
+                            self.toolbar.has(event.target).length === 0 &&
+                            self.toolbar.is(":visible")) {
+                            self.hide();
+                        }
+                    });
+                }
+
+                return;
+            }
 
             if (self.options.event != 'click') {
 
@@ -165,7 +180,11 @@ if ( typeof Object.create !== 'function' ) {
         populateContent: function() {
             var self = this;
             var location = self.toolbar.find('.tool-items');
-            var content = $(self.options.content).clone( true ).find('a').addClass('tool-item');
+            if(self.options.content instanceof $){
+                var content = self.options.content;
+            }else{
+                var content = $(self.options.content).clone(true).find('a').addClass('tool-item');
+            }
             location.html(content);
             location.find('.tool-item').on('click', function(event) {
                 event.preventDefault();
@@ -187,6 +206,10 @@ if ( typeof Object.create !== 'function' ) {
         getCoordinates: function( position, adjustment ) {
             var self = this;
             self.coordinates = self.$elem.offset();
+
+            if(self.options.coordinates){
+                return self.options.coordinates;
+            }
 
             if (self.options.adjustment && self.options.adjustment[self.options.position]) {
                 adjustment = self.options.adjustment[self.options.position] + adjustment;
@@ -243,7 +266,7 @@ if ( typeof Object.create !== 'function' ) {
             self.$elem.addClass('pressed');
             self.calculatePosition();
             self.toolbar.show().css({'opacity': 1}).addClass('animate-'+self.options.animation);
-            self.$elem.trigger('toolbarShown');
+            self.$elem.trigger('toolbarShown', self.toolbar);
         },
 
         hide: function() {
@@ -272,6 +295,11 @@ if ( typeof Object.create !== 'function' ) {
             });
 
             self.$elem.trigger('toolbarHidden');
+            $('html').off(".toolbar");
+            if(self.options.destroyOnHide){
+                this.toolbar.remove(); 
+                self.$elem.removeData('toolbarObj');
+            }
         },
 
         getToolbarElement: function () {
@@ -289,7 +317,10 @@ if ( typeof Object.create !== 'function' ) {
         } else if ( typeof options === 'string' && options.indexOf('_') !== 0 ) {
             var toolbarObj = $(this).data('toolbarObj');
             var method = toolbarObj[options];
-            return method.apply(toolbarObj, $.makeArray(arguments).slice(1));
+            if(toolbarObj){
+                console.log(toolbarObj)
+                return method.apply(toolbarObj, $.makeArray(arguments).slice(1));
+            }
         }
     };
 
@@ -301,7 +332,8 @@ if ( typeof Object.create !== 'function' ) {
         hover: false,
         style: 'default',
         animation: 'standard',
-        adjustment: 10
+        adjustment: 10, 
+        destroyOnHide: false
     };
 
 }) ( jQuery, window, document );
