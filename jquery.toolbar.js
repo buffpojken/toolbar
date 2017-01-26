@@ -208,7 +208,11 @@ if ( typeof Object.create !== 'function' ) {
             self.coordinates = self.$elem.offset();
 
             if(self.options.coordinates){
-                return self.options.coordinates;
+                return {
+                    left: self.options.coordinates.left-(self.toolbar.width()/2),
+                    top: self.options.coordinates.left-self.$elem.outerHeight()-adjustment,
+                    right: 'auto'
+                }
             }
 
             if (self.options.adjustment && self.options.adjustment[self.options.position]) {
