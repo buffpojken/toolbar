@@ -210,7 +210,7 @@ if ( typeof Object.create !== 'function' ) {
             if(self.options.coordinates){
                 return {
                     left: self.options.coordinates.left-(self.toolbar.width()/2),
-                    top: self.options.coordinates.top-self.$elem.outerHeight()-adjustment,
+                    top: self.options.coordinates.top-self.toolbar.outerHeight()-adjustment,
                     right: 'auto'
                 }
             }
